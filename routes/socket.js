@@ -10,7 +10,6 @@ module.exports = function (server) {
     var io = socketio.listen(server);
     var users = {}; // 接続しているユーザ情報
     var sockets = {}; // ソケット群 (key: username)
-    var twit = new TwitWrap();
 
     io.use(function (socket, next) {
         sessionMiddleware(socket.request, {}, next);
@@ -33,6 +32,7 @@ module.exports = function (server) {
             return;
         }
 
+        var twit = new TwitWrap({access_token: user.info.token, access_token_secret: user.info.tokenSecret});
         //var imageStreaming =  new ImageStream(twit, 'statuses/filter', { track: 'flower' });
         var imageStreaming =  new ImageStream(twit, 'user');
         imageStreaming.on('tweet/image', function (tweet, medias, retweetFrom) {
@@ -45,7 +45,6 @@ module.exports = function (server) {
             console.log('disconnected: ' + socket.id);
             delete users[socket.id];
             imageStreaming.stop();
-            imageStreaming = null;
         });
     });
 
