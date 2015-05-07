@@ -33,7 +33,7 @@ module.exports = function (server) {
             return;
         }
 
-        var imageStreaming =  new ImageStream(twit, 'statuses/filter', { track: 'night' });
+        var imageStreaming =  new ImageStream(twit, 'statuses/filter', { track: 'flower' });
         imageStreaming.on('tweet/image', function (tweet, medias, retweetFrom) {
             console.log(socket.id.substr(1, 2));
             socket.emit('tweet/image', {medias: medias});

@@ -5,7 +5,11 @@
         model = util.namespace('ImageStreaming.model'),
         Socket = model.Socket,
         defaultOptions = {
-            debugMode: true
+            debugMode: true,
+            masonrySelector: '#timeline',
+            masonryOptions: {
+                itemSelector: '.item'
+            }
         };
 
     viewmodel.Timeline = viewmodel.Timeline || Timeline;
@@ -14,11 +18,18 @@
         var that = this;
         that.opts = _.defaults(o || {}, defaultOptions);
 
+        that.$masonry = $(that.opts.masonrySelector).masonry(that.opts.masonryOptions);
+
         that.socket = new Socket({debugMode: that.opts.debugMode});
 
         that.socket.on('tweet/image', function (data, fn) {
             data.medias.forEach(function (media) {
-                $('body').prepend($('<img src="' + media.media_url + ':small">'));
+                var $item = $('<img src="' + media.media_url + ':small">');
+                $item.addClass('item');
+
+                that.$masonry
+                    .prepend($item)
+                    .masonry('prepended', $item[0])
             });
         });
     }
