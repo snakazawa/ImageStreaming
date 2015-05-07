@@ -1,11 +1,31 @@
-<!DOCTYPE html>
-<html>
-  <head>
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+</head>
+<body>
+
+<h1><%= title %></h1>
+
+<% if (mustLogin) { %>
+<p>Please login.</p>
+<% } %>
+
+<% if (logined) { %>
+
+<a href="/auth/logout">Logout</a>
+<p>Hi, <%= user.displayName %>.</p>
+
+<% } else { %>
+
+<p>Let's play with login.</p>
+<a href="/auth/twitter">Login</a>
+
+<% } %>
+
+
+</body>
+
 </html>

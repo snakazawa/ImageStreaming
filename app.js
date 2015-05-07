@@ -5,8 +5,37 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
+var passport = require('passport');
+var TwitterStrategy = require('passport-twitter').Strategy;
+var mongoose = require('mongoose');
+var config = require('config');
+var sessionMiddleware = require('./lib/modules/session');
+
+// mongoose
+mongoose.connect(config.get('mongo.url'));
+
+// passport
+passport.use(new TwitterStrategy({
+        consumerKey: config.get('twitter.consumer.key'),
+        consumerSecret: config.get('twitter.consumer.secret'),
+        callbackURL: config.get('twitter.callbackURL')
+    },
+    function (token, tokenSecret, profile, done) {
+        var user =  profile;
+        user.token = token;
+        user.tokenSecret = tokenSecret;
+
+        done(null, user);
+    }
+));
+
+passport.serializeUser(function(user, done) {
+    done(null, user);
+});
+
+passport.deserializeUser(function(user, done) {
+    done(null, user);
+});
 
 var app = express();
 
@@ -20,10 +49,16 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(sessionMiddleware);
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 
+var routes = require('./routes/index');
+var auth = require('./routes/auth')(passport);
+
 app.use('/', routes);
-app.use('/users', users);
+app.use('/auth', auth);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
