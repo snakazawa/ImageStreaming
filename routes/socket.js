@@ -3,10 +3,14 @@ var _ = require('lodash');
 var async = require('async');
 var sessionMiddleware = require('../lib/modules/session');
 
+var TwitWrap = require('../lib/models/twitter/TwitWrap');
+var ImageStream = require('../lib/models/twitter/ImageStream');
+
 module.exports = function (server) {
     var io = socketio.listen(server);
     var users = {}; // 接続しているユーザ情報
     var sockets = {}; // ソケット群 (key: username)
+    var twit = new TwitWrap();
 
     io.use(function (socket, next) {
         sessionMiddleware(socket.request, {}, next);
@@ -29,10 +33,18 @@ module.exports = function (server) {
             return;
         }
 
+        var imageStreaming =  new ImageStream(twit, 'statuses/filter', { track: 'night' });
+        imageStreaming.on('tweet/image', function (tweet, medias, retweetFrom) {
+            console.log(socket.id.substr(1, 2));
+            socket.emit('tweet/image', {medias: medias});
+        });
+
         // 切断
         socket.on('disconnect', function () {
             console.log('disconnected: ' + socket.id);
             delete users[socket.id];
+            imageStreaming.stop();
+            imageStreaming = null;
         });
     });
 

@@ -22,7 +22,7 @@ router.get('/timeline', function (req, res) {
         res.redirect('/?mustlogin=1');
     } else {
         res.render('timeline', {
-            title: 'Timeline' + '|' + config.get('title'),
+            title: 'Timeline' + ' | ' + config.get('title'),
             user: req.user
         });
     }
