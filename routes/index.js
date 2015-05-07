@@ -8,11 +8,24 @@ router.get('/', function (req, res) {
     var logined = req.isAuthenticated && req.isAuthenticated();
 
     res.render('index', {
-        title: config.title,
+        title: config.get('title'),
         mustLogin: mustLogin,
         logined: logined,
         user: req.user
     });
+});
+
+router.get('/timeline', function (req, res) {
+    var logined = req.isAuthenticated && req.isAuthenticated();
+
+    if (!logined) {
+        res.redirect('/?mustlogin=1');
+    } else {
+        res.render('timeline', {
+            title: 'Timeline' + '|' + config.get('title'),
+            user: req.user
+        });
+    }
 });
 
 module.exports = router;

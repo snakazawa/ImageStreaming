@@ -1,5 +1,5 @@
 var socketio = require('socket.io');
-var _ = require('underscore');
+var _ = require('lodash');
 var async = require('async');
 var sessionMiddleware = require('../lib/modules/session');
 
